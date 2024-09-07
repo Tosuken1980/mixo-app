@@ -8,7 +8,7 @@ import streamlit as st
 from PIL import Image
 import io
 import boto3
-import request
+import requests
 
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
