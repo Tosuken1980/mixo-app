@@ -8,6 +8,7 @@ import streamlit as st
 from PIL import Image
 import io
 import boto3
+import request
 
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
@@ -61,8 +62,15 @@ with col1:
         enviar = st.button("Subir imagen a S3")
         upload_image_to_s3(image, file_name, bucket, prefix)
         if enviar:
-            url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
-            st.write(url)
+            image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
+            data = {'imageUrl': image_url}
+            api_url = st.secrets["api_url"]
+            response = requests.post(api_url, json=data)
+            if response.status_code == 200:
+                result = response.json()
+                st.write(result)
+            else:
+                st.write("Something went wrong")
         
     else:
         st.text("Por favor, sube una imagen.")
