@@ -1,5 +1,4 @@
 openai
-json
 pandas
 python-dotenv
 streamlit
