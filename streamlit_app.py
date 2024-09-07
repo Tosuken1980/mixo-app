@@ -38,7 +38,7 @@ with col1:
         st.image(image, caption='Imagen subida', use_column_width=True)
         enviar = st.button("Subir imagen a S3")
         if enviar:
-            st.write(file_namae
+            st.write(file_name)
     else:
         st.text("Por favor, sube una imagen.")
 
