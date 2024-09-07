@@ -61,7 +61,8 @@ with col1:
         enviar = st.button("Subir imagen a S3")
         upload_image_to_s3(image, file_name, bucket, prefix)
         if enviar:
-            st.write(file_name)
+            url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
+            st.write(url)
         
     else:
         st.text("Por favor, sube una imagen.")
