@@ -8,7 +8,7 @@ import streamlit as st
 from PIL import Image
 
 
-client = OpenAI(api_key=st.secrets('OPENAI_API_KEY'))
+client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
