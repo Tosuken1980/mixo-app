@@ -3,3 +3,5 @@ pandas
 python-dotenv
 streamlit
 Pillow
+boto3
+io
