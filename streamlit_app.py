@@ -26,7 +26,7 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
         img_byte_arr.seek(0)
         
         # Subir la imagen a S3
-        s3_client.upload_fileobj(img_byte_arr, bucket, s3_key)
+        s3.upload_fileobj(img_byte_arr, bucket, s3_key)
         st.success("Imagen subida correctamente!")
     except Exception as e:
         st.error(f"Error al subir la imagen: {e}")
