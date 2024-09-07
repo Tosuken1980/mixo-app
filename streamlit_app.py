@@ -7,10 +7,11 @@ from zoneinfo import ZoneInfo
 import streamlit as st
 from PIL import Image
 import io
+import boto3
 
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
-s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets('aws_secret_access_key'))
+s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
 
 bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
