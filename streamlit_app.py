@@ -43,7 +43,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 #prompt = "Escribeme un codigo para dada una lista en python con n+1 numeros, uno de ellos repetidos, poder identificar el numero repetido"
 prompt = "Escribeme una frase de matematica o estadistica"
-answer = get_completion(prompt)
+##answer = get_completion(prompt)
 
 text = answer
 # Título de la aplicación
@@ -60,12 +60,12 @@ with col1:
         file_name = uploaded_image.name
         st.image(image, caption='Imagen subida', use_column_width=True)
         enviar = st.button("Subir imagen a S3")
-        upload_image_to_s3(image, file_name, bucket, prefix)
+        #upload_image_to_s3(image, file_name, bucket, prefix)
         if enviar:
             image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
             data = {'imageUrl': image_url}
             api_url = st.secrets["api_url"]
-            response = requests.post(api_url, json=data)
+            #response = requests.post(api_url, json=data)
             if response.status_code == 200:
                 result = response.json()
                 st.write(result)
