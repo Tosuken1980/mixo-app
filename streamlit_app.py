@@ -10,16 +10,6 @@ import io
 import boto3
 import requests
 
-page_bg_img = """
-    <style>
-    .reportview-container {
-        background-color: #d0f0c0;   
-    }
-    </style>
-    """
-    
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
 
@@ -52,14 +42,14 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
     return response.choices[0].message.content 
 
 #prompt = "Escribeme un codigo para dada una lista en python con n+1 numeros, uno de ellos repetidos, poder identificar el numero repetido"
-prompt = "Escribeme un codigo para dada una lista en python con n+1 numeros, uno de ellos repetidos, poder identificar el numero repetido"
+prompt = "Escribeme una frase de matematica o estadistica"
 answer = get_completion(prompt)
 
 text = answer
 # Título de la aplicación
 st.title("Aplicación de dos columnas con imagen y texto")
 # Crear dos columnas
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([1, 2])
 
 # Cargar imagen en la primera columna
 with col1:
