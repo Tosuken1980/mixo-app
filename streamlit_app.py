@@ -6,9 +6,30 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import streamlit as st
 from PIL import Image
+import io
 
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
+s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets('aws_secret_access_key'))
+
+bucket = st.secrets["bucket_image_dwls"]
+prefix = "web-images/"
+
+def upload_image_to_s3(image, file_name, bucket, prefix):
+    final_name = file_name + '-%Y%m%d%H%M%S'
+    s3_key = f"{prefix}{final_name}"
+    try:
+        # Convertir la imagen a bytes
+        img_byte_arr = io.BytesIO()
+        image.save(img_byte_arr, format='PNG')
+        img_byte_arr.seek(0)
+        
+        # Subir la imagen a S3
+        s3_client.upload_fileobj(img_byte_arr, bucket, s3_key)
+        st.success("Imagen subida correctamente!")
+    except Exception as e:
+        st.error(f"Error al subir la imagen: {e}")
+
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -37,8 +58,10 @@ with col1:
         file_name = uploaded_image.name
         st.image(image, caption='Imagen subida', use_column_width=True)
         enviar = st.button("Subir imagen a S3")
+        upload_image_to_s3(image, file_name, bucket, prefix)
         if enviar:
             st.write(file_name)
+        
     else:
         st.text("Por favor, sube una imagen.")
 
