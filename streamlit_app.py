@@ -49,7 +49,7 @@ text = answer
 # Título de la aplicación
 st.title("Aplicación de dos columnas con imagen y texto")
 # Crear dos columnas
-col1, col2 = st.columns([1, 2])
+col1, col2 = st.columns([7, 3])
 
 # Cargar imagen en la primera columna
 with col1:
