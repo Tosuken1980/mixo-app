@@ -17,7 +17,7 @@ bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
 
 def upload_image_to_s3(image, file_name, bucket, prefix):
-    final_name = file_name + '-%Y%m%d%H%M%S'
+    final_name = file_name
     s3_key = f"{prefix}{final_name}"
     try:
         # Convertir la imagen a bytes
