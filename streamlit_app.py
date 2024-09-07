@@ -29,5 +29,6 @@ with col1:
 with col2:
     st.header("Texto")
     st.write("Aquí puedes poner algunos textos.")
+    st.write("Aquí puedes poner algunos textos.", st.secrets["testing_secret"])
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
