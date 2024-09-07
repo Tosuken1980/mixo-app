@@ -34,7 +34,11 @@ with col1:
     uploaded_image = st.file_uploader("Elige una imagen...", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
         image = Image.open(uploaded_image)
+        file_name = uploaded_image.name
         st.image(image, caption='Imagen subida', use_column_width=True)
+        enviar = st.button("Subir imagen a S3")
+        if enviar:
+            st.write(file_namae
     else:
         st.text("Por favor, sube una imagen.")
 
