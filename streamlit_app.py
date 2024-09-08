@@ -16,6 +16,8 @@ s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_s
 bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
 
+answer = ""
+
 def upload_image_to_s3(image, file_name, bucket, prefix):
     final_name = file_name
     s3_key = f"{prefix}{final_name}"
@@ -66,11 +68,14 @@ with col1:
             data = {'imageUrl': image_url}
             api_url = st.secrets["api_url"]
             #response = requests.post(api_url, json=data)
-            if response.status_code == 200:
-                result = response.json()
-                st.write(result)
-            else:
-                st.write("Something went wrong")
+            try:
+                if response.status_code == 200:
+                    result = response.json()
+                    st.write(result)
+                else:
+                    st.write("Something went wrong")
+            except:
+                pass
         
     else:
         st.text("Por favor, sube una imagen.")
