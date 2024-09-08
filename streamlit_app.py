@@ -46,8 +46,10 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 #prompt = "Escribeme un codigo para dada una lista en python con n+1 numeros, uno de ellos repetidos, poder identificar el numero repetido"
 prompt = "Escribeme una frase de matematica o estadistica"
 ##answer = get_completion(prompt)
-
 text = answer
+
+
+st.set_page_config(layout="wide")
 # Título de la aplicación
 st.title("Aplicación de dos columnas con imagen y texto")
 # Crear dos columnas
