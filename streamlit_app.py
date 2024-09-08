@@ -50,6 +50,22 @@ text = answer
 
 
 st.set_page_config(layout="wide")
+
+# Añadir CSS personalizado para cambiar el color de fondo
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background-color: #ffb3ba;  /* Cambia esto al color que desees */
+    }
+    .main .block-container {
+        background-color: #a8e6cf;  /* Cambia esto al color que desees */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Título de la aplicación
 st.title("Aplicación de dos columnas con imagen y texto")
 # Crear dos columnas
