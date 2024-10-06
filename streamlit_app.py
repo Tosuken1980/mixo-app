@@ -85,7 +85,7 @@ with col1:
             image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
             data = {'imageUrl': image_url}
             api_url = st.secrets["api_url"]
-            #response = requests.post(api_url, json=data)
+            response = requests.post(api_url, json=data)
             try:
                 if response.status_code == 200:
                     result = response.json()
