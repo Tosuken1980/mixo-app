@@ -80,7 +80,7 @@ with col1:
         file_name = uploaded_image.name
         st.image(image, caption='Imagen subida', use_column_width=True)
         enviar = st.button("Subir imagen a S3")
-        #upload_image_to_s3(image, file_name, bucket, prefix)
+        upload_image_to_s3(image, file_name, bucket, prefix)
         if enviar:
             image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
             data = {'imageUrl': image_url}
