@@ -73,8 +73,8 @@ with col1:
         image = Image.open(uploaded_image)
         file_name = uploaded_image.name
         st.image(image, caption='upload image', use_column_width=True)
-        enviar = st.button("Analyze image")
         upload_image_to_s3(image, file_name, bucket, prefix)
+        enviar = st.button("Analyze image")
         if enviar:
             with st.spinner("Processing image..."):
                 image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
@@ -88,7 +88,7 @@ with col1:
                 try:
                     if response.status_code == 200:
                         result = response.json()
-                        st.write(result)
+                        #st.write(result)
                     else:
                         st.write("Something went wrong")
                 except Exception as e:
@@ -99,7 +99,17 @@ with col1:
 
 # Añadir textos en la segunda columna
 with col2:
-    st.header("Texto")
+    st.header("Space for additional information")
     st.write("Aquí puedes poner algunos textos.")
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
+
+if result:
+    exclude_keys = ['category', 'information', 'execution_time', 'image']
+    for key, value in result["menu"].items():
+        if key not in exclude_keys:
+            st.subheader(f"Cocktail: {key}")
+            col1, colsep, col2, col3, col4 = st.columns([3, 0.1, 1, 1, 1])
+            with col1:
+                ingredients = ", ".join(value)
+                st.markdown(f"**Ingredients:** {ingredients}")
