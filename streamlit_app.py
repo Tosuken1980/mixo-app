@@ -102,4 +102,3 @@ with col2:
     st.write("Aquí puedes poner algunos textos.")
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
-    st.write(text)
