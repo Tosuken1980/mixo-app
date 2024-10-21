@@ -12,7 +12,7 @@ import requests
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
-
+secret_token = st.secrets['token']
 bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
 
@@ -74,25 +74,27 @@ with col1:
         file_name = uploaded_image.name
         st.image(image, caption='upload image', use_column_width=True)
         upload_image_to_s3(image, file_name, bucket, prefix)
-        enviar = st.button("Analyze image")
-        if enviar:
-            with st.spinner("Processing image..."):
-                image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
-                data = {'imageUrl': image_url}
-                api_url = st.secrets["api_url"]
-                
-                # Hacer la solicitud POST
-                response = requests.post(api_url, json=data)
-                
-                # Manejar la respuesta
-                try:
-                    if response.status_code == 200:
-                        result = response.json()
-                        show_result = True
-                    else:
-                        st.write("Something went wrong")
-                except Exception as e:
-                    st.write(f"Error: {e}")
+        token = st.text_input("Enter your token:", "")
+        if token == "prueba":
+            enviar = st.button("Analyze image")
+            if enviar:
+                with st.spinner("Processing image..."):
+                    image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
+                    data = {'imageUrl': image_url}
+                    api_url = st.secrets["api_url"]
+                    
+                    # Hacer la solicitud POST
+                    response = requests.post(api_url, json=data)
+                    
+                    # Manejar la respuesta
+                    try:
+                        if response.status_code == 200:
+                            result = response.json()
+                            show_result = True
+                        else:
+                            st.write("Something went wrong")
+                    except Exception as e:
+                        st.write(f"Error: {e}")
         
     else:
         st.text("Please upload a cocktail menu image")
