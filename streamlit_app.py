@@ -75,7 +75,7 @@ with col1:
         st.image(image, caption='upload image', use_column_width=True)
         upload_image_to_s3(image, file_name, bucket, prefix)
         token = st.text_input("Enter your token:", "")
-        if token == "prueba":
+        if token == secret_token:
             enviar = st.button("Analyze image")
             if enviar:
                 with st.spinner("Processing image..."):
