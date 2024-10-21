@@ -17,7 +17,7 @@ bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
 
 answer = ""
-result = None
+show_result = False
 def upload_image_to_s3(image, file_name, bucket, prefix):
     final_name = file_name
     s3_key = f"{prefix}{final_name}"
@@ -88,7 +88,7 @@ with col1:
                 try:
                     if response.status_code == 200:
                         result = response.json()
-                        #st.write(result)
+                        show_result = True
                     else:
                         st.write("Something went wrong")
                 except Exception as e:
@@ -104,14 +104,15 @@ with col2:
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
 
-if result["menu"]["category"]=="cocktail":
-    exclude_keys = ['category', 'information', 'execution_time', 'image']
-    for key, value in result["menu"].items():
-        if key not in exclude_keys:
-            st.subheader(f"Cocktail: {key}")
-            col1, colsep, col2, col3, col4 = st.columns([3, 0.1, 1, 1, 1])
-            with col1:
-                ingredients = ", ".join(value)
-                st.markdown(f"**Ingredients:** {ingredients}")
-else:
-    st.text("Please upload a cocktail menu image")
+if show_result:
+    if result["menu"]["category"]=="cocktail":
+        exclude_keys = ['category', 'information', 'execution_time', 'image']
+        for key, value in result["menu"].items():
+            if key not in exclude_keys:
+                st.subheader(f"Cocktail: {key}")
+                col1, colsep, col2, col3, col4 = st.columns([3, 0.1, 1, 1, 1])
+                with col1:
+                    ingredients = ", ".join(value)
+                    st.markdown(f"**Ingredients:** {ingredients}")
+    else:
+        st.text("Please upload a cocktail menu image")
