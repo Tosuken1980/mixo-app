@@ -17,7 +17,7 @@ bucket = st.secrets["bucket_image_dwls"]
 prefix = "web-images/"
 
 answer = ""
-
+result = None
 def upload_image_to_s3(image, file_name, bucket, prefix):
     final_name = file_name
     s3_key = f"{prefix}{final_name}"
@@ -104,7 +104,7 @@ with col2:
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
 
-if result:
+if result["menu"]["category"]=="cocktail":
     exclude_keys = ['category', 'information', 'execution_time', 'image']
     for key, value in result["menu"].items():
         if key not in exclude_keys:
@@ -113,3 +113,5 @@ if result:
             with col1:
                 ingredients = ", ".join(value)
                 st.markdown(f"**Ingredients:** {ingredients}")
+else:
+    st.text("Please upload a cocktail menu image")
