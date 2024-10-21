@@ -29,9 +29,9 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
         
         # Subir la imagen a S3
         s3.upload_fileobj(img_byte_arr, bucket, s3_key)
-        st.success("Imagen subida correctamente!")
+        st.success("Upload to S3 successfully!")
     except Exception as e:
-        st.error(f"Error al subir la imagen: {e}")
+        st.error(f"Error uploading: {e}")
 
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
@@ -42,12 +42,6 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
         temperature=0, # this is the degree of randomness of the model's output
     )
     return response.choices[0].message.content 
-
-#prompt = "Escribeme un codigo para dada una lista en python con n+1 numeros, uno de ellos repetidos, poder identificar el numero repetido"
-prompt = "Escribeme una frase de matematica o estadistica"
-##answer = get_completion(prompt)
-text = answer
-
 
 st.set_page_config(layout="wide")
 
@@ -67,33 +61,37 @@ st.markdown(
 )
 
 # Título de la aplicación
-st.title("Aplicación de dos columnas con imagen y texto")
+st.title("Cocktail menu evaluation")
 # Crear dos columnas
 col1, col2 = st.columns([7, 3])
 
 # Cargar imagen en la primera columna
 with col1:
     st.header("Imagen")
-    uploaded_image = st.file_uploader("Elige una imagen...", type=["jpg", "jpeg", "png"])
+    uploaded_image = st.file_uploader("Upload a cocktail image...", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
         image = Image.open(uploaded_image)
         file_name = uploaded_image.name
         st.image(image, caption='Imagen subida', use_column_width=True)
         enviar = st.button("Subir imagen a S3")
         upload_image_to_s3(image, file_name, bucket, prefix)
-        if enviar:
+        with st.spinner("Processing image..."):
             image_url = f"https://{bucket}.s3.eu-north-1.amazonaws.com/{prefix}{file_name}"
             data = {'imageUrl': image_url}
             api_url = st.secrets["api_url"]
+            
+            # Hacer la solicitud POST
             response = requests.post(api_url, json=data)
+            
+            # Manejar la respuesta
             try:
                 if response.status_code == 200:
                     result = response.json()
                     st.write(result)
                 else:
                     st.write("Something went wrong")
-            except:
-                pass
+            except Exception as e:
+                st.write(f"Error: {e}")
         
     else:
         st.text("Por favor, sube una imagen.")
