@@ -148,17 +148,19 @@ if show_result:
             if key not in exclude_keys:
                 st.subheader(f"Cocktail: {key}")
                 col1, colsep, col2 = st.columns([3, 0.1, 2])
-                with col1:
+                try:
                     ingredients = ", ".join(value)
+                except:
+                    ingredients = "No info"
+                with col1:
                     st.markdown(f"**Ingredients:** {ingredients}")
                 with col2:
-                    ingredients = ", ".join(value)
                     embeddings = get_embeddings(ingredients, model="text-embedding-3-small")
                     embeddings_pca = pca.transform(embeddings).mean(axis=0)
                     embeddings_pca = embeddings_pca.reshape(1, len(embeddings_pca))
                     top_recipes = find_similarities(embeddings_pca, embeddings_data)
                     cocktail_info = {}
-                    if top_recipes.shape[0]>=1:
+                    if (top_recipes.shape[0]>=1) & (ingredients != "No info") :
                         category_preparation, probability_preparation = estimate_cocktail_class(top_recipes,"cocktail_preparation")
                         category_appearance, probability_appearance = estimate_cocktail_class(top_recipes,"cocktail_appearance")
                         category_temperature, probability_temperature = estimate_cocktail_class(top_recipes,"temperature_serving")
