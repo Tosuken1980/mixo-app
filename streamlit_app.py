@@ -12,6 +12,7 @@ from io import StringIO
 import boto3
 import requests
 import joblib
+from sklearn.metrics.pairwise import cosine_similarity
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
@@ -26,6 +27,8 @@ prefix = "web-images/"
 csv_obj = s3.get_object(Bucket=bucket_name, Key=object_name)
 body = csv_obj['Body'].read().decode('utf-8')
 df_cocktails_info = pd.read_csv(StringIO(body))
+
+embeddings_data = df_cocktails_info.loc[:, df_cocktails_info.columns.str.startswith('PC')].to_numpy()
 n_cocktails = df_cocktails_info.shape[0]
 
 s3_response_object_pca = s3.get_object(Bucket=bucket_name, Key=pca_model_name)
@@ -55,6 +58,16 @@ def get_embeddings(texts, model="text-embedding-3-small"):
     embeddings = client.embeddings.create(input=texts, model=model).data
     embedding=np.array([embedding.embedding for embedding in embeddings])
     return pd.DataFrame(embedding)
+
+def find_similarities(embedding_reference, embeddings_data):
+    similarities = cosine_similarity(embeddings_data, embedding_reference)
+    df_cocktails_info['similarity_v2v'] = similarities.flatten()
+    df_sorted = df_cocktails_info.sort_values(by='similarity_v2v', ascending=False)
+    filtered_recipes = df_sorted[df_sorted['similarity_v2v'] > 0.55]
+    top_recipes = filtered_recipes if len(filtered_recipes) <= 15 else df_sorted.head(15)
+    top_recipes = top_recipes[["cocktail_name", "transformed_ingredients", "cocktail_preparation", "cocktail_appearance", "temperature_serving", "similarity_v2v"]]
+
+    return top_recipes
 
 st.set_page_config(layout="wide")
 
@@ -134,6 +147,7 @@ if show_result:
                     embeddings = get_embeddings(ingredients, model="text-embedding-3-small")
                     embeddings_pca = pca.transform(embeddings).mean(axis=0)
                     embeddings_pca = embeddings_pca.reshape(1, len(embeddings_pca))
-                    st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca)}")
+                    top_recipes = find_similarities(embeddings_pca, embeddings_data)
+                    st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca[0])}")
     else:
         st.text("Please upload a cocktail menu image")
