@@ -196,8 +196,8 @@ if show_result:
                         category_appearance, probability_appearance = estimate_cocktail_class(top_recipes,"cocktail_appearance")
                         category_temperature, probability_temperature = estimate_cocktail_class(top_recipes,"temperature_serving")
                         if preparation_by_ingredient != "unknown":
-                            category_preparation = preparation_by_ingredient
-                            probability_preparation = 1
+                            category_appearance = preparation_by_ingredient
+                            probability_appearance = 1
                         cocktail_info = {
                             'cocktail_appearance': [category_appearance, probability_appearance],
                             'temperature_serving': [category_temperature, probability_temperature],
