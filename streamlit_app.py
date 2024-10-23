@@ -147,7 +147,7 @@ if show_result:
         for key, value in result["menu"].items():
             if key not in exclude_keys:
                 st.subheader(f"Cocktail: {key}")
-                col1, colsep, col2, col3, col4 = st.columns([3, 0.1, 1, 1, 1])
+                col1, colsep, col2 = st.columns([3, 0.1, 2])
                 with col1:
                     ingredients = ", ".join(value)
                     st.markdown(f"**Ingredients:** {ingredients}")
@@ -163,19 +163,18 @@ if show_result:
                         category_appearance, probability_appearance = estimate_cocktail_class(top_recipes,"cocktail_appearance")
                         category_temperature, probability_temperature = estimate_cocktail_class(top_recipes,"temperature_serving")
                         cocktail_info = {
-                            'cocktail_appearance': {category_appearance: probability_appearance},
-                            'temperature_serving': {category_temperature: probability_temperature},
-                            'cocktail_preparation': {category_preparation: probability_preparation},
-                            'total_cocktails': top_recipes.shape[0],
+                            'cocktail_appearance': [category_appearance, probability_appearance],
+                            'temperature_serving': [category_temperature, probability_temperature],
+                            'cocktail_preparation': [category_preparation, probability_preparation],
                         }
-                        st.markdown("### This cocktail should be:")
+                        st.subheader("This cocktail should be:")
                         for key, value in cocktail_info.items():
-                            st.write(f"- **{key}:** {value}")
+                            st.write(f"- **{value[0]}:** {value[1]}")
                     else:
                         cocktail_info = {
                             'total_cocktails': 0
                         } 
-                        st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca[0])}")
+                        st.markdown(f"We do not have enough information for evaluate this cocktail")
 
     else:
         st.text("Please upload a cocktail menu image")
