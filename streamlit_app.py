@@ -69,6 +69,15 @@ def find_similarities(embedding_reference, embeddings_data):
 
     return top_recipes
 
+def estimate_cocktail_class(top_recipes,col):
+    grouped_similarities = top_recipes.groupby(col)['similarity_v2v'].sum()
+    total_similarity = grouped_similarities.sum()
+    grouped_percentages = (grouped_similarities / total_similarity) * 100
+    category = grouped_percentages.idxmax()
+    probability = np.round(grouped_percentages[grouped_percentages.idxmax()],2)
+    return category, probability
+
+
 st.set_page_config(layout="wide")
 
 # Añadir CSS personalizado para cambiar el color de fondo
@@ -148,6 +157,25 @@ if show_result:
                     embeddings_pca = pca.transform(embeddings).mean(axis=0)
                     embeddings_pca = embeddings_pca.reshape(1, len(embeddings_pca))
                     top_recipes = find_similarities(embeddings_pca, embeddings_data)
-                    st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca[0])}")
+                    cocktail_info = {}
+                    if top_recipes.shape[0]>=1:
+                        category_preparation, probability_preparation = estimate_cocktail_class(top_recipes,"cocktail_preparation")
+                        category_appearance, probability_appearance = estimate_cocktail_class(top_recipes,"cocktail_appearance")
+                        category_temperature, probability_temperature = estimate_cocktail_class(top_recipes,"temperature_serving")
+                        cocktail_info = {
+                            'cocktail_appearance': {category_appearance: probability_appearance},
+                            'temperature_serving': {category_temperature: probability_temperature},
+                            'cocktail_preparation': {category_preparation: probability_preparation},
+                            'total_cocktails': top_recipes.shape[0],
+                        }
+                        st.markdown("### This cocktail should be:")
+                        for key, value in cocktail_info.items():
+                            st.write(f"- **{key}:** {value}")
+                    else:
+                        cocktail_info = {
+                            'total_cocktails': 0
+                        } 
+                        st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca[0])}")
+
     else:
         st.text("Please upload a cocktail menu image")
