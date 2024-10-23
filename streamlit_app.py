@@ -12,18 +12,20 @@ from io import StringIO
 import boto3
 import requests
 
-client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
-s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
-secret_token = st.secrets['token']
-bucket = st.secrets["bucket_image_dwls"]
-bucket_name = st.secrets["bucket_mixo_data"]
-object_name = "cocktails_extended.csv"
-prefix = "web-images/"
+@st.cache_data
+def load_data_from_s3():
+    client = boto3.client('s3', 
+                          aws_access_key_id=st.secrets['aws_access_key_id'], 
+                          aws_secret_access_key=st.secrets['aws_secret_access_key'])
+    bucket_name = st.secrets["bucket_mixo_data"]
+    object_name = "cocktails_extended.csv"
+    
+    csv_obj = client.get_object(Bucket=bucket_name, Key=object_name)
+    body = csv_obj['Body'].read().decode('utf-8')
+    return pd.read_csv(StringIO(body))
 
+df_cocktails_info = load_data_from_s3()
 
-csv_obj = s3.get_object(Bucket=bucket_name, Key=object_name)
-body = csv_obj['Body'].read().decode('utf-8')
-df_cocktails_info = pd.read_csv(StringIO(body))
 n_cocktails = df_cocktails_info.shape[0]
 
 
