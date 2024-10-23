@@ -34,6 +34,7 @@ pca = joblib.load(file_stream)
 
 answer = ""
 show_result = False
+
 def upload_image_to_s3(image, file_name, bucket, prefix):
     final_name = file_name
     s3_key = f"{prefix}{final_name}"
@@ -52,9 +53,8 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
 def get_embeddings(texts, model="text-embedding-3-small"):
     texts = texts.split(", ")
     embeddings = client.embeddings.create(input=texts, model=model).data
-    mean_embedding = np.array([embedding.embedding for embedding in embeddings]).mean(axis=0)
-    mean_embedding = mean_embedding.reshape(1, len(mean_embedding))
-    return mean_embedding
+    embedding=np.array([embedding.embedding for embedding in embeddings])
+    return pd.DataFrame(embedding)
 
 st.set_page_config(layout="wide")
 
@@ -128,6 +128,10 @@ if show_result:
                 col1, colsep, col2, col3, col4 = st.columns([3, 0.1, 1, 1, 1])
                 with col1:
                     ingredients = ", ".join(value)
+                    st.markdown(f"**Ingredients:** {ingredients}")
+                with col2:
+                    ingredients = ", ".join(value)
+                    embeddings = get_embeddings(ingredients, model="text-embedding-3-small")
                     st.markdown(f"**Ingredients:** {ingredients}")
     else:
         st.text("Please upload a cocktail menu image")
