@@ -1,5 +1,6 @@
 from openai import OpenAI
 import json
+import re
 import os
 import numpy as np
 import pandas as pd
@@ -56,7 +57,7 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
 def get_embeddings(texts, model="text-embedding-3-small"):
     texts = str.lower(texts).split(", ")
     embeddings = client.embeddings.create(input=texts, model=model).data
-    embedding=np.array([embedding.embedding for embedding in embeddings])
+    embedding = np.array([embedding.embedding for embedding in embeddings])
     return pd.DataFrame(embedding)
 
 def find_similarities(embedding_reference, embeddings_data):
@@ -77,7 +78,34 @@ def estimate_cocktail_class(top_recipes,col):
     probability = np.round(grouped_percentages[grouped_percentages.idxmax()],2)
     return category, probability
 
+def find_cloudy(word):
+    pattern = r'\b(citrus|juice|orange|naranja|lemon|lime|limon|pineapple|grapefruit|coconut|puree|purée|mango|strawberry|passionfruit|egg|amarula|coffee|chocolate|cinnamon|nutmeg|cocoa|liqueur)\b'
+    match = re.search(pattern, word, re.IGNORECASE)
+    return bool(match)
 
+def find_milky(word):
+    pattern = r'\b(dairy|milk|buttermilk|half and half|half & half|half-and-half|cream|single cream|whipped cream|cream cheese|yogurt|sour cream|ice cream|heavy cream|irish cream|cream liqueur|frangelico|bailey|amarula|mousse)\b'
+    exceptions = ['coconut cream', 'avocado cream', 'almond cream', 'dream cream','cream of coconut', 'orange cream citrate', 'cream sherry', 'red cream soda']
+    
+    # Reemplaza las excepciones por "--" en la palabra
+    word = word.lower()
+    for exception in exceptions:
+        word = word.replace(exception, "--")
+    match = re.search(pattern, word, re.IGNORECASE)
+    return bool(match)
+
+
+def preparation_by_ingredient_inspection(ingredient_list):
+    preparation_by_observation = "unknown"
+    milky = sum(find_milky(word) for word in ingredient_list)
+    cloudy = sum(find_cloudy(word) for word in ingredient_list)
+    if milky > 0:
+        preparation_by_observation = "milky"
+    elif cloudy >0 :
+        preparation_by_observation = "cloudy"
+    else:
+        pass
+    return preparation_by_observation
 st.set_page_config(layout="wide")
 
 # Añadir CSS personalizado para cambiar el color de fondo
@@ -149,9 +177,12 @@ if show_result:
                 st.subheader(f"Cocktail: {key}")
                 col1, colsep, col2 = st.columns([3, 0.1, 2])
                 try:
+                    value = [str.lower(items) for items in value]
                     ingredients = ", ".join(value)
+                    preparation_by_ingredient = preparation_by_ingredient_inspection(value)
                 except:
                     ingredients = "No info"
+                    preparation_by_ingredient = "unknown"
                 with col1:
                     st.markdown(f"**Ingredients:** {ingredients}")
                 with col2:
@@ -164,6 +195,9 @@ if show_result:
                         category_preparation, probability_preparation = estimate_cocktail_class(top_recipes,"cocktail_preparation")
                         category_appearance, probability_appearance = estimate_cocktail_class(top_recipes,"cocktail_appearance")
                         category_temperature, probability_temperature = estimate_cocktail_class(top_recipes,"temperature_serving")
+                        if preparation_by_ingredient != "unknown":
+                            category_preparation = preparation_by_ingredient
+                            probability_preparation = 1
                         cocktail_info = {
                             'cocktail_appearance': [category_appearance, probability_appearance],
                             'temperature_serving': [category_temperature, probability_temperature],
