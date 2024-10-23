@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 import streamlit as st
 from PIL import Image
 import io
+from io import StringIO
 import boto3
 import requests
 
@@ -15,7 +16,16 @@ client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
 secret_token = st.secrets['token']
 bucket = st.secrets["bucket_image_dwls"]
+bucket_name = st.secrets["bucket_mixo_data"]
+object_name = "cocktails_extended.csv"
 prefix = "web-images/"
+
+
+csv_obj = s3.get_object(Bucket=bucket_name, Key=object_name)
+body = csv_obj['Body'].read().decode('utf-8')
+df_cocktails_info = pd.read_csv(StringIO(body))
+n_cocktails = df_cocktails_info.shape[0]
+
 
 answer = ""
 show_result = False
@@ -100,7 +110,7 @@ with col1:
 # Añadir textos en la segunda columna
 with col2:
     st.header("Space for additional information")
-    st.write("Aquí puedes poner algunos textos.")
+    st.write(f"Total cocktails: {n_cocktails}")
     st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
     st.write("¡Puedes añadir más detalles según lo necesites!")
 
