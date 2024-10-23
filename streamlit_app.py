@@ -1,6 +1,7 @@
 from openai import OpenAI
 import json
 import os
+import numpy as np
 import pandas as pd
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -33,15 +34,12 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
     except Exception as e:
         st.error(f"Error uploading: {e}")
 
-
-def get_completion(prompt, model="gpt-3.5-turbo"):
-    messages = [{"role": "user", "content": prompt}]
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages, # type: ignore
-        temperature=0, # this is the degree of randomness of the model's output
-    )
-    return response.choices[0].message.content 
+def get_embeddings(texts, model="text-embedding-3-small"):
+    texts = texts.split(", ")
+    embeddings = client.embeddings.create(input=texts, model=model).data
+    mean_embedding = np.array([embedding.embedding for embedding in embeddings]).mean(axis=0)
+    mean_embedding = mean_embedding.reshape(1, len(mean_embedding))
+    return mean_embedding
 
 st.set_page_config(layout="wide")
 

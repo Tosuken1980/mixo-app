@@ -1,5 +1,6 @@
 openai
 pandas
+numpy
 python-dotenv
 streamlit
 Pillow
