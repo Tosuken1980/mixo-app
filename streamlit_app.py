@@ -54,7 +54,7 @@ def upload_image_to_s3(image, file_name, bucket, prefix):
         st.error(f"Error uploading: {e}")
 
 def get_embeddings(texts, model="text-embedding-3-small"):
-    texts = texts.split(", ")
+    texts = str.lower(texts).split(", ")
     embeddings = client.embeddings.create(input=texts, model=model).data
     embedding=np.array([embedding.embedding for embedding in embeddings])
     return pd.DataFrame(embedding)
@@ -63,7 +63,7 @@ def find_similarities(embedding_reference, embeddings_data):
     similarities = cosine_similarity(embeddings_data, embedding_reference)
     df_cocktails_info['similarity_v2v'] = similarities.flatten()
     df_sorted = df_cocktails_info.sort_values(by='similarity_v2v', ascending=False)
-    filtered_recipes = df_sorted[df_sorted['similarity_v2v'] > 0.55]
+    filtered_recipes = df_sorted[df_sorted['similarity_v2v'] > 0.20]
     top_recipes = filtered_recipes if len(filtered_recipes) <= 15 else df_sorted.head(15)
     top_recipes = top_recipes[["cocktail_name", "transformed_ingredients", "cocktail_preparation", "cocktail_appearance", "temperature_serving", "similarity_v2v"]]
 
@@ -167,9 +167,11 @@ if show_result:
                             'temperature_serving': [category_temperature, probability_temperature],
                             'cocktail_preparation': [category_preparation, probability_preparation],
                         }
-                        st.subheader("This cocktail should be:")
+                        st.markdown(f"**This cocktail should be::**")
                         for key, value in cocktail_info.items():
                             st.write(f"- **{value[0]}:** {value[1]}")
+                        
+                        st.markdown(f"**Nearest cocktail similarity in our database:** {np.round(100*top_recipes.iloc[0].similarity_v2v,2)}%")
                     else:
                         cocktail_info = {
                             'total_cocktails': 0
