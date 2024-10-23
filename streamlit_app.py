@@ -20,14 +20,10 @@ bucket_name = st.secrets["bucket_mixo_data"]
 object_name = "cocktails_extended.csv"
 prefix = "web-images/"
 
-@st.cache_data
-def load_data_from_s3(object_name,bucket_name):
-    csv_obj = client.get_object(Bucket=bucket_name, Key=object_name)
-    body = csv_obj['Body'].read().decode('utf-8')
 
-    return pd.read_csv(StringIO(body))
-
-df_cocktails_info = load_data_from_s3(object_name,bucket_name)
+csv_obj = s3.get_object(Bucket=bucket_name, Key=object_name)
+body = csv_obj['Body'].read().decode('utf-8')
+df_cocktails_info = pd.read_csv(StringIO(body))
 n_cocktails = df_cocktails_info.shape[0]
 
 
