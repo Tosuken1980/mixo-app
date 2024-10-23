@@ -72,7 +72,7 @@ def find_similarities(embedding_reference, embeddings_data):
 def estimate_cocktail_class(top_recipes,col):
     grouped_similarities = top_recipes.groupby(col)['similarity_v2v'].sum()
     total_similarity = grouped_similarities.sum()
-    grouped_percentages = (grouped_similarities / total_similarity) * 100
+    grouped_percentages = (grouped_similarities / total_similarity) 
     category = grouped_percentages.idxmax()
     probability = np.round(grouped_percentages[grouped_percentages.idxmax()],2)
     return category, probability
@@ -169,7 +169,7 @@ if show_result:
                         }
                         st.markdown(f"**This cocktail should be::**")
                         for key, value in cocktail_info.items():
-                            st.write(f"- **{value[0]}:** {value[1]}")
+                            st.write(f"- **{value[0]}** with a probability of {value[1]}")
                         
                         st.markdown(f"**Nearest cocktail similarity in our database:** {np.round(100*top_recipes.iloc[0].similarity_v2v,2)}%")
                     else:
