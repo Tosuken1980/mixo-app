@@ -6,5 +6,5 @@ streamlit
 Pillow
 boto3
 requests
-sklearn
+scikit-learn
 joblib
