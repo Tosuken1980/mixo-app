@@ -11,6 +11,7 @@ import io
 from io import StringIO
 import boto3
 import requests
+import joblib
 
 client = OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 s3 = boto3.client('s3', aws_access_key_id=st.secrets['aws_access_key_id'], aws_secret_access_key=st.secrets['aws_secret_access_key'])
@@ -18,6 +19,7 @@ secret_token = st.secrets['token']
 bucket = st.secrets["bucket_image_dwls"]
 bucket_name = st.secrets["bucket_mixo_data"]
 object_name = "cocktails_extended.csv"
+pca_model_name = "pca_model.pkl"
 prefix = "web-images/"
 
 
@@ -26,6 +28,9 @@ body = csv_obj['Body'].read().decode('utf-8')
 df_cocktails_info = pd.read_csv(StringIO(body))
 n_cocktails = df_cocktails_info.shape[0]
 
+s3_response_object_pca = s3.get_object(Bucket=bucket_name, Key=pca_model_name)
+file_stream = io.BytesIO(s3_response_object_pca['Body'].read())
+pca = joblib.load(file_stream)
 
 answer = ""
 show_result = False
@@ -110,9 +115,9 @@ with col1:
 # Añadir textos en la segunda columna
 with col2:
     st.header("Space for additional information")
-    st.write(f"Total cocktails: {n_cocktails}")
-    st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
-    st.write("¡Puedes añadir más detalles según lo necesites!")
+    st.write(f"Database cocktails: {n_cocktails}")
+    #st.write("Este es un ejemplo de cómo puedes organizar el contenido en columnas.")
+    #st.write("¡Puedes añadir más detalles según lo necesites!")
 
 if show_result:
     if result["menu"]["category"]=="cocktail":

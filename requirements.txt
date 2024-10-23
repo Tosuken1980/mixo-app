@@ -6,3 +6,5 @@ streamlit
 Pillow
 boto3
 requests
+sklearn
+joblib
