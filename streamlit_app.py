@@ -132,6 +132,8 @@ if show_result:
                 with col2:
                     ingredients = ", ".join(value)
                     embeddings = get_embeddings(ingredients, model="text-embedding-3-small")
-                    st.markdown(f"**Ingredients:** {ingredients}")
+                    embeddings_pca = pca.transform(embeddings).mean(axis=0)
+                    embeddings_pca = embeddings_pca.reshape(1, len(embeddings_pca))
+                    st.markdown(f"**Ingredients:** {ingredients}. {len(embeddings_pca)}")
     else:
         st.text("Please upload a cocktail menu image")
