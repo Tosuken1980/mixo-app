@@ -13,18 +13,19 @@ import boto3
 import requests
 
 @st.cache_data
-def load_data_from_s3():
+def load_data_from_s3(object_name):
     client = boto3.client('s3', 
                           aws_access_key_id=st.secrets['aws_access_key_id'], 
                           aws_secret_access_key=st.secrets['aws_secret_access_key'])
     bucket_name = st.secrets["bucket_mixo_data"]
-    object_name = "cocktails_extended.csv"
     
     csv_obj = client.get_object(Bucket=bucket_name, Key=object_name)
     body = csv_obj['Body'].read().decode('utf-8')
+
     return pd.read_csv(StringIO(body))
 
-df_cocktails_info = load_data_from_s3()
+object_name = "cocktails_extended.csv"
+df_cocktails_info = load_data_from_s3(object_name)
 
 n_cocktails = df_cocktails_info.shape[0]
 
